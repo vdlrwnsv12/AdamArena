@@ -1,5 +1,7 @@
 # 아담 투기장 (Adam Arena) — 악몽 리허설
 
+> 🍎 **macOS + Steam 판 전용 모드입니다.** Windows, GOG, Epic, 콘솔 판은 지원하지 않습니다.
+
 사이버펑크 2077용 redscript 모드입니다. 집 침대 대화에 **"아담과 싸우기 — 악몽 리허설"** 항목을 추가해, 꿈속에서 미코시 보스 방의 아담 스매셔와 반복 전투를 할 수 있게 합니다.
 
 > ⚠️ **시험판(0.6.6)** — 컴파일과 로직 검사는 통과했지만, 실제 게임에서의 표시·입력·이동·소환·복귀는 아직 충분히 검증되지 않았습니다. 반드시 **별도 저장본**으로 시험하세요.
@@ -14,12 +16,12 @@
 자세한 내용은 [`사용법.txt`](사용법.txt), 검증 범위는 [`검증.txt`](검증.txt)를 보세요.
 
 ## 요구 사항
-- Cyberpunk 2077 2.5 (macOS Steam 판에서 개발)
-- redscript 0.5.32
+- **macOS** (Apple Silicon)
+- **Steam 판** Cyberpunk 2077 2.5 (기본 스팀 라이브러리 경로)
+- redscript 0.5.32 (키트에 포함, 별도 설치 불필요)
 
 ## 설치
 
-### macOS (권장, 게임 파일을 바꾸지 않는 방식)
 1. [Releases](../../releases)에서 `AdamArena-0.6.6-macOS.zip`을 받아 새 폴더에 풉니다.
 2. 인터넷에서 받은 파일이라 macOS가 실행을 막으면, 터미널에서 다음 명령을 실행합니다:
    `xattr -dr com.apple.quarantine <압축 푼 폴더>`
@@ -27,18 +29,14 @@
    - 게임 원본 캐시를 교체하지 않고, 별도로 컴파일한 스크립트로 게임을 실행합니다.
    - 스팀 일반 실행으로는 모드가 적용되지 않습니다.
 
-### redscript를 이미 쓰는 경우 (수동 설치, 미검증)
-`AdamArena-0.6.6-r6scripts.zip`을 게임 폴더에 풀면 `r6/scripts/AdamArena/AdamArena.reds`가 들어갑니다. redscript가 게임 시작 때 컴파일합니다. 이 방식과 Windows 환경은 테스트하지 않았습니다.
-
 ## 문제 신고
 [Issues](../../issues)에 증상과 함께 `state/compile.log`, `state/play.log`, `state/game.log`를 첨부해 주세요.
 
 ---
 
 ## English (short)
-A redscript mod for Cyberpunk 2077 that adds a "Fight Adam — Nightmare Rehearsal" option to V's bed dialog, letting you repeatedly fight Adam Smasher in a dream arena. **Experimental build (0.6.6), Korean UI only, developed on macOS (game 2.5, redscript 0.5.32).** Use a separate save.
-- macOS: unzip `AdamArena-0.6.6-macOS.zip`, run `INSTALL.command`, then `PLAY.command`.
-- Other: extract `AdamArena-0.6.6-r6scripts.zip` into the game folder (untested).
+A redscript mod for Cyberpunk 2077 that adds a "Fight Adam — Nightmare Rehearsal" option to V's bed dialog, letting you repeatedly fight Adam Smasher in a dream arena. **macOS + Steam version only. Experimental build (0.6.6), Korean UI only (game 2.5, redscript 0.5.32 bundled).** Use a separate save.
+Install: unzip `AdamArena-0.6.6-macOS.zip`, run `INSTALL.command`, then `PLAY.command`. Windows / GOG / Epic / consoles are not supported.
 
 ## 크레딧
 - 컴파일러: [redscript](https://github.com/jac3km4/redscript) v0.5.32 (MIT, [`tools/REDSCRIPT-LICENSE`](tools/REDSCRIPT-LICENSE))
