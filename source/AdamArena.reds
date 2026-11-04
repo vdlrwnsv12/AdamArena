@@ -1,11 +1,11 @@
-// Adam Arena 0.6.6 — native-game API experiment for macOS 2.5.
+// Adam Arena 0.6.7 — native-game API experiment for macOS 2.5.
 // Requires redscript 0.5.32. No custom native declarations or Windows plugins.
 
 // Visible probes independent of the player-attachment callback and HUD messages.
 @wrapMethod(SingleplayerMenuGameController)
 protected cb func OnInitialize() -> Bool {
   wrappedMethod();
-  inkTextRef.SetText(this.m_versionTextRef, "아담 투기장 0.6.6 스크립트 로드");
+  inkTextRef.SetText(this.m_versionTextRef, "아담 투기장 0.6.7 스크립트 로드");
 }
 
 @wrapMethod(PauseMenuGameController)
@@ -19,9 +19,9 @@ protected cb func OnInitialize() -> Bool {
   };
   if IsDefined(this.m_buttonHintsController) {
     if IsDefined(player) && IsDefined(player.adamArenaController) {
-      this.m_buttonHintsController.AddButtonHint(n"back", "악몽 리허설 0.6.6 · 상태 확인 메뉴 추가됨");
+      this.m_buttonHintsController.AddButtonHint(n"back", "악몽 리허설 0.6.7 · 상태 확인 메뉴 추가됨");
     } else {
-      this.m_buttonHintsController.AddButtonHint(n"back", "아담 0.6.6: 플레이어 초기화 대기");
+      this.m_buttonHintsController.AddButtonHint(n"back", "아담 0.6.7: 플레이어 초기화 대기");
     };
   };
 }
@@ -43,7 +43,7 @@ protected cb func OnMenuItemActivated(index: Int32, target: ref<ListItemControll
   if IsDefined(data) && Equals(data.eventName, n"AdamDreamDiagnostics") {
     player = this.GetPlayerControlledObject() as PlayerPuppet;
     if IsDefined(player) && IsDefined(player.adamArenaController) && !IsDefined(this.adamDiagnosticsToken) {
-      this.adamDiagnosticsToken = GenericMessageNotification.Show(this, "악몽 리허설 0.6.6 — 상태", player.adamArenaController.Status() + "\n\n" + player.adamArenaController.BedDiagnostics(), GenericMessageNotificationType.Confirm);
+      this.adamDiagnosticsToken = GenericMessageNotification.Show(this, "악몽 리허설 0.6.7 — 상태", player.adamArenaController.Status() + "\n\n" + player.adamArenaController.BedDiagnostics(), GenericMessageNotificationType.Confirm);
       this.adamDiagnosticsToken.RegisterListener(this, n"OnAdamDiagnosticsClosed");
     };
     return true;
@@ -298,7 +298,7 @@ public class AdamArenaController extends IScriptable {
       this.lastBedSnapshot = AdamDreamBedChoices.DebugState(this.player);
     };
     if this.tickCount == 4 {
-      this.Message("악몽 리허설 0.6.6 실행 중. 침대에서 잠자기 / 아담과 싸우기 선택.");
+      this.Message("악몽 리허설 0.6.7 실행 중. 침대에서 잠자기 / 아담과 싸우기 선택.");
     };
     if this.bedConfirmCapture > 0 { this.bedConfirmCapture -= 1; };
     if this.bedSleepBypass > 0 { this.bedSleepBypass -= 1; };
@@ -1512,3 +1512,164 @@ protected cb func OnPlayerDetach(playerGameObject: ref<GameObject>) -> Bool {
   return true;
 }
 
+
+// Native macOS: return the exact ingredient from a Chimera mod's recipe.
+// Preview is pure. Only an actual successful inventory removal grants a core.
+public abstract class AdamChimeraRules {
+  public final static func IsChimera(itemID: ItemID) -> Bool {
+    let record: ref<Item_Record> = TweakDBInterface.GetItemRecord(ItemID.GetTDBID(itemID));
+    return IsDefined(record) && record.TagsContains(n"ChimeraMod");
+  }
+
+  public final static func CoreRecord(itemID: ItemID) -> ref<Item_Record> {
+    let recipe: array<wref<RecipeElement_Record>>;
+    let record: ref<Item_Record> = TweakDBInterface.GetItemRecord(ItemID.GetTDBID(itemID));
+    let none: ref<Item_Record>;
+    if !IsDefined(record) || !record.TagsContains(n"ChimeraMod") || !IsDefined(record.CraftingData()) {
+      return none;
+    };
+    record.CraftingData().CraftingRecipe(recipe);
+    // Fail closed if another mod changed the one-core recipe structure.
+    if ArraySize(recipe) != 1 || !IsDefined(recipe[0]) || recipe[0].Amount() != 1 {
+      return none;
+    };
+    return recipe[0].Ingredient();
+  }
+
+  public final static func CanRecycle(itemData: wref<gameItemData>) -> Bool {
+    return IsDefined(itemData) && !itemData.HasTag(n"Quest") && !itemData.HasTag(n"UnequipBlocked") && IsDefined(AdamChimeraRules.CoreRecord(itemData.GetID()));
+  }
+
+  public final static func RemovedCount(before: Int32, after: Int32, requested: Int32) -> Int32 {
+    if before <= 0 || after < 0 || requested <= 0 || after >= before {
+      return 0;
+    };
+    return Min(requested, before - after);
+  }
+
+  public final static func Queue(executor: wref<GameObject>, itemID: ItemID, quantity: Int32) -> Void {
+    let request: ref<DisassembleItemRequest>;
+    let player: ref<PlayerPuppet> = executor as PlayerPuppet;
+    let crafting: ref<CraftingSystem>;
+    if !IsDefined(player) || player.IsReplacer() || quantity <= 0 {
+      return;
+    };
+    crafting = CraftingSystem.GetInstance(executor.GetGame());
+    if !crafting.CanItemBeDisassembled(executor, itemID) {
+      return;
+    };
+    request = new DisassembleItemRequest();
+    request.target = executor;
+    request.itemID = itemID;
+    request.amount = quantity;
+    crafting.QueueRequest(request);
+  }
+}
+
+@wrapMethod(CraftingSystem)
+public final const func CanItemBeDisassembled(itemData: wref<gameItemData>) -> Bool {
+  if IsDefined(itemData) && AdamChimeraRules.IsChimera(itemData.GetID()) {
+    return AdamChimeraRules.CanRecycle(itemData);
+  };
+  return wrappedMethod(itemData);
+}
+
+// Some iconic mods have no Disassemble object action. Use the same native
+// request queue after the inventory UI's hold/quantity/confirmation handling.
+@wrapMethod(ItemActionsHelper)
+public final static func DisassembleItem(executor: wref<GameObject>, itemID: ItemID) -> Void {
+  if AdamChimeraRules.IsChimera(itemID) {
+    AdamChimeraRules.Queue(executor, itemID, 1);
+    return;
+  };
+  wrappedMethod(executor, itemID);
+}
+
+@wrapMethod(ItemActionsHelper)
+public final static func DisassembleItem(executor: wref<GameObject>, itemID: ItemID, quantity: Int32) -> Void {
+  if AdamChimeraRules.IsChimera(itemID) {
+    AdamChimeraRules.Queue(executor, itemID, quantity);
+    return;
+  };
+  wrappedMethod(executor, itemID, quantity);
+}
+
+@wrapMethod(CraftingSystem)
+public final const func GetDisassemblyResultItems(target: wref<GameObject>, itemID: ItemID, amount: Int32, restoredAttachments: script_ref<[ItemAttachments]>, opt calledFromUI: Bool) -> [IngredientData] {
+  let result: array<IngredientData>;
+  let core: ref<Item_Record>;
+  if AdamChimeraRules.IsChimera(itemID) {
+    core = AdamChimeraRules.CoreRecord(itemID);
+    if IsDefined(core) && amount > 0 {
+      ArrayPush(result, this.CreateIngredientData(core, amount));
+    };
+    return result;
+  };
+  return wrappedMethod(target, itemID, amount, restoredAttachments, calledFromUI);
+}
+
+@wrapMethod(CraftingSystem)
+private final const func DisassembleItem(target: wref<GameObject>, itemID: ItemID, amount: Int32) -> Void {
+  let player: ref<PlayerPuppet>;
+  let transaction: ref<TransactionSystem>;
+  let itemData: wref<gameItemData>;
+  let core: ref<Item_Record>;
+  let before: Int32;
+  let quantity: Int32;
+  let removed: Int32;
+  let result: array<IngredientData>;
+  if !AdamChimeraRules.IsChimera(itemID) {
+    wrappedMethod(target, itemID, amount);
+    return;
+  };
+  player = target as PlayerPuppet;
+  if !IsDefined(player) || player.IsReplacer() || amount <= 0 {
+    return;
+  };
+  transaction = GameInstance.GetTransactionSystem(target.GetGame());
+  itemData = transaction.GetItemData(target, itemID);
+  if !AdamChimeraRules.CanRecycle(itemData) || RPGManager.IsItemEquipped(target, itemID) || transaction.HasItemInAnySlot(target, itemID) {
+    return;
+  };
+  core = AdamChimeraRules.CoreRecord(itemID);
+  before = transaction.GetItemQuantity(target, itemID);
+  quantity = Min(before, amount);
+  if quantity <= 0 {
+    return;
+  };
+  if !transaction.RemoveItem(target, itemID, quantity) {
+    return;
+  };
+  removed = AdamChimeraRules.RemovedCount(before, transaction.GetItemQuantity(target, itemID), quantity);
+  if removed <= 0 {
+    return;
+  };
+  if !transaction.GiveItem(target, ItemID.FromTDBID(core.GetID()), removed) {
+    // Keep the user's crafted mod if the core cannot be added.
+    transaction.GiveItem(target, itemID, removed);
+    return;
+  };
+  this.m_playerCraftBook.AdamRestoreChimeraRecipes(core.GetID());
+  GameInstance.GetTelemetrySystem(this.GetGameInstance()).LogItemDisassembled(target, itemID);
+  ArrayPush(result, this.CreateIngredientData(core, removed));
+  this.UpdateBlackboard(CraftingCommands.DisassemblingFinished, itemID, result);
+}
+
+// These recipes can be hidden once one of the four mods is crafted.
+// Restore only recipes already learned and using the same returned core.
+@addMethod(CraftBook)
+public final func AdamRestoreChimeraRecipes(coreID: TweakDBID) -> Void {
+  let record: ref<Item_Record>;
+  let core: ref<Item_Record>;
+  let i: Int32 = 0;
+  while i < ArraySize(this.m_knownRecipes) {
+    record = TweakDBInterface.GetItemRecord(this.m_knownRecipes[i].targetItem);
+    if IsDefined(record) && record.TagsContains(n"ChimeraMod") {
+      core = AdamChimeraRules.CoreRecord(ItemID.FromTDBID(record.GetID()));
+      if IsDefined(core) && core.GetID() == coreID {
+        this.m_knownRecipes[i].isHidden = false;
+      };
+    };
+    i += 1;
+  };
+}

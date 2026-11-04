@@ -1,36 +1,38 @@
-악몽 리허설 0.6.6 검증 기록
+악몽 리허설 0.6.7 검증 기록
 
-사용자 맥 2.5 원본 캐시에 대해 redscript 0.5.32 소스 빌드 Linux scc 컴파일 성공
-배포 도구는 기존 공식 macOS scc / libscc_lib.dylib 유지
-source/AdamArena.reds SHA256: 22e233dd45daae601144bfbafd9ed21737e68cfd5550acaef93ac90ca8125d03
+제공된 맥 2.5 원본 스크립트 캐시 + 공식 redscript 0.5.32 소스 빌드 Linux scc: 컴파일 성공
+컴파일 결과 재로드 및 단일 파일 역컴파일: 성공
+배포 도구: 기존 공식 macOS ARM scc / libscc_lib.dylib 유지
+source/AdamArena.reds SHA256: 164a9e748fa82dca209cfad8aaee30301fc79e24b2f66d85c7563aa50e34d94e
 
-컴파일 결과 재로드 및 단일 파일 역컴파일 성공
-기본 대화 UI의 NativeBedView 구성/선택 인덱스 반영/행 생성 확인 연결 확인
-보스 방 도착 대기/성공/시간 초과 분기 연결 확인
-입장 요청을 처리한 갱신에서 즉시 반환하며, 도착 대기 분기가 경계 검사보다 먼저 실행됨 확인
-원래 대화 블랙보드 배열을 SetVariant로 교체하는 코드 없음
-별도 inkCanvas/inkText 생성 및 임의 폰트/배경 코드 제거 확인
-0.6.5 사이버웨어 용량 계산 코드 동일함 확인
-자동 초기화 경로 없음, G 입장 경로 없음
-모든 .sh/.command bash -n 성공
-컴파일 입력과 배포 소스 동일함 확인
-원본 백업과 제공된 원본 캐시 바이트 동일함 확인
+추가 기능
+CraftingSystem.CanItemBeDisassembled의 gameItemData 오버로드 연결
+ItemActionsHelper.DisassembleItem의 단일·수량 오버로드 연결
+CraftingSystem.GetDisassemblyResultItems에서 실제 제작 재료를 미리보기 결과로 반환
+CraftingSystem.DisassembleItem에서 실제 제거 성공 및 전후 수량 차이를 확인한 뒤 코어 지급
+코어 지급 실패 시 제거한 부품 재지급 시도
+이미 배운 동일 코어 제작법의 숨김 해제
+ChimeraMod 태그가 없는 아이템은 원래 구현으로 전달
+원래 퀘스트·해제 금지 태그와 장착 중 제한 유지
+분해 결과 조회 함수에 GiveItem/RemoveItem 호출이 없는 것을 컴파일 결과에서 확인
 
-순수 도착 판정 회귀 검사 8개 성공
-소스에서 함수를 추출해 같은 비교/분기를 C++로 실행한 검사이며, 게임 엔진 검사는 아님
-PASS still_at_home_first_update -> 0
-PASS world_streaming_still_pending -> 0
-PASS destination_arrived -> 1
-PASS maximum_arrival_radius -> 1
-PASS not_arrived_vertical_mismatch -> 0
-PASS not_arrived_horizontal_mismatch -> 0
-PASS arrival_timeout -> 2
-PASS arrival_on_deadline -> 1
+변경 범위 확인
+0.6.6 소스의 버전 문구만 0.6.7로 바꾼 원문이 그대로 보존되고, 그 뒤에 키메라 기능만 추가됨 확인
+기존 침대 UI, 도착 처리, 전투, 특전·특성 초기화와 용량 벌칙 코드 변경 없음
+실제 눕기·기상 애니메이션은 미연결. 실제 H10 장면 확인을 위한 읽기 전용 수집기 포함
 
-실제 맥 UI 표시/입력/전투 이동과 소환/복귀는 미검증
+분해 수량 판정
+최종 RemovedCount 소스의 함수 본문을 추출하고 if 문 괄호와 Min 표기만 C++ 형식으로 바꿔 실행
+9개 경우 통과: 단일 제거, 취소/실패, 여러 개, 일부 제거, 빈 가방, 수량 증가, 0 요청, 잘못된 음수 수량, 요청 수량 상한
+이는 순수 함수 검사이며 엔진 인벤토리 트랜잭션의 실제 성공 검사가 아님
 
-[INFO - Wed, 4 Nov 2026 16:30:58 +0000] Redscript cache file is not ours, copying it to /workspace/scratch/b9495ba735fc/internal-checks/compile066/r6/cache/final.redscripts.bk
-[INFO - Wed, 4 Nov 2026 16:30:59 +0000] Compiling files in /workspace/scratch/b9495ba735fc/internal-checks/compile066/r6/scripts:
-AdamArena/AdamArena.reds
-[INFO - Wed, 4 Nov 2026 16:31:00 +0000] Compilation complete
-[INFO - Wed, 4 Nov 2026 16:31:01 +0000] Output successfully saved to /workspace/scratch/b9495ba735fc/internal-checks/compile066/r6/cache/final.redscripts
+침대 파일 수집기
+WolvenKit 원본 RDAR 헤더/인덱스/엔트리/세그먼트 구조 대조
+FNV-1a 공개 검사 벡터 대조
+합성 RDAR 아카이브 검사 8개 통과:
+해시 벡터, 접두어별 경로 검색, 무관한 파일 제외, 잘린 헤더 거부, 잘린 인덱스 거부,
+범위 밖 세그먼트 거부, 과대 파일 거부, 원본 바이트 보존 및 모드 제외·출력 덮어쓰기 방지
+실제 맥 게임 아카이브에서의 수집은 아직 미검증
+
+실제 맥 게임 UI의 분해 입력, 코어 반환, 재제작은 아직 미검증
+컴파일 성공을 실제 게임 동작 성공으로 간주하지 않음

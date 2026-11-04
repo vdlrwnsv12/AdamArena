@@ -1,0 +1,17 @@
+침대 파일 수집기 참고 자료
+
+RDAR 구조의 원본 구현
+WolvenKit, ArchiveReader.cs / Header.cs
+commit 6ab5da88c009b99e653ce87be5251a9c5bd15330
+https://github.com/WolvenKit/WolvenKit/blob/6ab5da88c009b99e653ce87be5251a9c5bd15330/WolvenKit.RED4/Archive/IO/ArchiveReader.cs
+https://github.com/WolvenKit/WolvenKit/blob/6ab5da88c009b99e653ce87be5251a9c5bd15330/WolvenKit.RED4/Archive/Base/Header.cs
+FNV-1a 동작과 검사 벡터
+https://github.com/WolvenKit/WolvenKit/blob/6ab5da88c009b99e653ce87be5251a9c5bd15330/WolvenKit.Core/FNV1A/FNV1A64HashAlgorithm.cs
+https://github.com/WolvenKit/WolvenKit/blob/6ab5da88c009b99e653ce87be5251a9c5bd15330/Tests/WolvenKit.UnitTests/FNV1A64Tests.cs
+
+리소스 경로 사전
+https://github.com/DoctorPresto/Cyberpunk-File-Types
+scene.txt / questphase.txt / ent.txt / workspot.txt
+
+파일 수집기는 압축을 해제하거나 아카이브를 수정하지 않습니다.
+아카이브의 지정 경로에 해당하는 압축 조각과 위치·크기·해시 정보만 복사합니다.

@@ -1,0 +1,17 @@
+# H10 apartment scene, phase, bedding and player bed workspots.
+quest\minor_quests\mq000\entities\appearances\bedding\bedding_default.ent
+quest\minor_quests\mq000\entities\appearances\bedding\bedding_pink.ent
+quest\minor_quests\mq000\entities\appearances\bedding\bedding_rich_gold_black.ent
+quest\minor_quests\mq000\entities\appearances\bedding\bedding_rich_white_silk.ent
+quest\minor_quests\mq000\entities\mq000_bedding.ent
+quest\minor_quests\mq000\phases\mq000_vs_apartment_decorations.questphase
+quest\minor_quests\mq000\phases\mq000_vs_apartment_interactions.questphase
+quest\minor_quests\mq000\scenes\mq000_01_apartment.scene
+quest\minor_quests\mq000\scenes\versions\gold\mq000_01_apartment.scene
+quest\minor_quests\mq000\scenes\versions\patch0\mq000_01_apartment.scene
+quest\minor_quests\mq000\scenes\versions\patch1_2\mq000_01_apartment.scene
+workspots\player\bed\player__lie_bed_lean_back__idle__01.workspot
+workspots\player\bed\player__lie_bed_lean_back__sleep__01.workspot
+workspots\player\bed\player__lie_bed_lean_left__idle__01.workspot
+workspots\player\bed\player__sit_bed_lean_front__sit_around__01.workspot
+workspots\player\bed\player__sit_bed__idle__01.workspot

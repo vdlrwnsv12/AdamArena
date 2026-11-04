@@ -12,7 +12,7 @@ check_build
 [ "$(hash_file "$CACHE_FILE")" = "$(cat "$STATE_DIR/baseline.sha256")" ] || fail "게임 캐시가 준비 당시와 다릅니다. 새 시험본을 준비해 주세요."
 [ "$(hash_file "$STATE_DIR/candidate.redscripts")" = "$(cat "$STATE_DIR/candidate.sha256")" ] || fail "시험 캐시가 변경됐습니다."
 [ "$(hash_file "$KIT_DIR/source/AdamArena.reds")" = "$(cat "$STATE_DIR/source.sha256")" ] || fail "소스가 준비 후 변경됐습니다. 새 시험본을 준비해 주세요."
-echo "아담 시험판 0.6.6: 지정한 스크립트 파일로 게임을 실행합니다."
+echo "아담 시험판 0.6.7: 지정한 스크립트 파일로 게임을 실행합니다."
 echo "스팀이 실행 중이고 로그인돼 있어야 합니다."
 printf '스크립트 인자: %s\n' "-scriptsBlobPath=$STATE_DIR/candidate.redscripts"
 # The macOS 2.5 loader passes this option as one argument, with an equals sign.
