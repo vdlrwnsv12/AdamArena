@@ -1,0 +1,8 @@
+공식 redscript v0.5.32 맥 배포본
+https://github.com/jac3km4/redscript/releases/tag/v0.5.32
+다운로드 주소
+https://github.com/jac3km4/redscript/releases/download/v0.5.32/redscript-v0.5.32-macos.zip
+
+압축에서 추출한 도구의 SHA-256
+scc a3b9f6216c66ff6674332e52ce828f3d9930f7c7f210731eb1910ac6d2bf95a3
+libscc_lib.dylib 386e9a13fa0677bb1e31a749b3651e6a4dd181acc424f5ab6fd6dbc1db6839e2
